@@ -1,0 +1,8 @@
+<div class="menu">
+  <p>Suspectible amount {{suspectibleAmount}}</p>
+  <mat-slider color="primary" [min]="5" [max]="3000" step="5" [(value)]="suspectibleAmount" (change)="onValueChange()">
+  </mat-slider>
+  <p>Infected amount {{infectedAmount}}</p>
+  <mat-slider color="primary" [min]="1" [max]="100" step="1" [(value)]="infectedAmount" (change)="onValueChange()">
+  </mat-slider>
+</div>

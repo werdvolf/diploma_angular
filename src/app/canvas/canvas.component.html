@@ -1,0 +1,7 @@
+<div>
+  <canvas class="canvas" #canvas [width]="width" [height]="height"></canvas>
+  <div class="buttons">
+    <button color="primary" mat-raised-button (click)="startAnimate()" [disabled]="disable">Start Render</button>
+    <button color="warn" mat-raised-button (click)="stopAnimate()" [disabled]="!disable">Stop Render</button>
+  </div>
+</div>

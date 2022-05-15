@@ -1,0 +1,14 @@
+.canvas {
+  background-color: darkgray;
+  display: block;
+  margin: auto;
+}
+.buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+button {
+  margin-top: 10px;
+  margin-right: 10px;
+}
