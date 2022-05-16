@@ -2,6 +2,7 @@ import * as someStaff from './someStaff';
 
 const width = 700;
 const height = 700;
+const timeToRecover = 10000;
 
 export interface IParticle {
   x: number;
@@ -10,17 +11,20 @@ export interface IParticle {
   dy: number;
   status: string;
   particleRadius: number;
+  infectedTime: number;
   color: string;
   move(): void;
   updateStatus(value: string): void;
   setSpeed(dx: number, dy: number): void;
   getStatus(): string;
   changeColor(value: string): void;
+  checkIfRecovered(): void;
 }
 
 export class Particle implements IParticle {
   status: string;
   particleRadius = 5;
+  infectedTime = 0;
   color: string;
   x = someStaff.random(this.particleRadius, width - this.particleRadius);
   dx = someStaff.randomSpeedUp(-4, 4);
@@ -32,6 +36,7 @@ export class Particle implements IParticle {
     this.status = status;
     if (this.status == 'i') {
       this.color = '#FF0000';
+      this.checkIfRecovered();
     } else if (this.status == 's') {
       this.color = '#0095DD';
     } else if (this.status == 'r') {
@@ -64,11 +69,19 @@ export class Particle implements IParticle {
   public getStatus(): string {
     return this.status;
   }
-  public updateStatus(value: string) {
+  public updateStatus(value: string): void {
     this.status = value;
   }
+
   public changeColor(value: string) {
     this.color = value;
+  }
+
+  public checkIfRecovered() {
+    setTimeout(() => {
+      this.updateStatus('r');
+      this.changeColor('#808080');
+    }, timeToRecover);
   }
 }
 

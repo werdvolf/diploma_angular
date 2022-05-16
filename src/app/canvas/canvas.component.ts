@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { IParticle, Particle, Renderer } from '../interfaces/particle';
-import { checkAndUpdate } from '../interfaces/someStaff';
+import { Particle, Renderer } from '../interfaces/particle';
+import { checkAndUpdate, getParticleAmount } from '../interfaces/someStaff';
 import { ShareService } from '../share.service';
 @Component({
   selector: 'app-canvas',
@@ -11,8 +11,9 @@ export class CanvasComponent implements OnInit {
   //canvas width and heigth
   width: number = 700;
   height: number = 700;
-  suspectibleAmount: number | null;
-  infectedAmount: number | null;
+  suspectibleAmount: number;
+  recoveredAmount: number = 0;
+  infectedAmount: number;
   intervalId: any;
   disable: boolean = false;
   //init renderer class
@@ -26,9 +27,14 @@ export class CanvasComponent implements OnInit {
   private ctx: CanvasRenderingContext2D | null;
 
   //send labels to share service
-  sendLabels(infectedChartLabels: number[], suspectibleChartLabels: number[]) {
+  sendLabels(
+    infectedChartLabels: number[],
+    suspectibleChartLabels: number[],
+    recoveredChartLabels: number[]
+  ) {
     this.shareService.sendInfectedChartLabels(infectedChartLabels);
     this.shareService.sendSuspectibleChartLabels(suspectibleChartLabels);
+    this.shareService.sendRecoveredChartLabels(recoveredChartLabels);
   }
 
   //get particles amount from share service
@@ -49,62 +55,70 @@ export class CanvasComponent implements OnInit {
     this.getParticlesAmount();
   }
 
-  createParticles(n: number | null, status: string): Particle[] {
+  createParticles(
+    numOfSuspectible: number | null,
+    numOfInfected: number | null
+  ): Particle[] {
     let particles: Particle[] = [];
-    if (this.ctx && n) {
-      for (let i = 0; i < n; i++) {
-        particles[i] = new Particle(status);
+    if (this.ctx && numOfSuspectible && numOfInfected) {
+      for (let i = 0; i < numOfSuspectible + numOfInfected; i++) {
+        if (i < numOfInfected) particles[i] = new Particle('i');
+        else particles[i] = new Particle('s');
       }
     }
     return particles;
   }
 
-  createLabels(infected: IParticle[], suspectible: IParticle[]) {
-    let infectedChartLabels: number[] = [];
-    let suspectibleChartLabels: number[] = [];
-    if (this.infectedAmount && this.suspectibleAmount) {
-      infectedChartLabels.push(infected.length);
-      suspectibleChartLabels.push(suspectible.length);
-    }
-    return [infectedChartLabels, suspectibleChartLabels];
-  }
-
   startAnimate(): void {
     this.disable = true;
-    let currentSuspectibleAmount: number, currentInfectedAmount: number;
+    let currentSuspectibleAmount: number,
+      currentInfectedAmount: number,
+      currentRecoveredAmount: number;
+    let infectedChartLabels: number[] = [this.infectedAmount],
+      suspectibleChartLabels: number[] = [this.suspectibleAmount],
+      recoveredChartLabels: number[] = [this.recoveredAmount];
     //crete particles
-    let suspectible = this.createParticles(this.suspectibleAmount, 's');
-    let infected = this.createParticles(this.infectedAmount, 'i');
-    //create array for chart
-    let [infectedChartLabels, suspectibleChartLabels] = this.createLabels(
-      infected,
-      suspectible
+    let particles = this.createParticles(
+      this.suspectibleAmount,
+      this.infectedAmount
     );
+    //create array for chart
 
     this.intervalId = setInterval(() => {
       //render particles
-      this.renderer.animate(suspectible.concat(infected));
+      this.renderer.animate(particles);
       //check if infected particles are in radius of suspectible
       //and update status if rolled chance
-      checkAndUpdate(suspectible, infected);
+      checkAndUpdate(particles);
       //calculate current amount of suspectible and infected particles
-      if (this.suspectibleAmount && this.infectedAmount) {
-        currentSuspectibleAmount =
-          this.suspectibleAmount - infected.length + this.infectedAmount;
-        currentInfectedAmount = infected.length;
-        //update values for chart
-        if (
-          currentInfectedAmount !=
-          infectedChartLabels[infectedChartLabels.length - 1]
-        ) {
-          infectedChartLabels.push(currentInfectedAmount);
-          suspectibleChartLabels.push(currentSuspectibleAmount);
-        }
+      [
+        currentInfectedAmount,
+        currentSuspectibleAmount,
+        currentRecoveredAmount,
+      ] = getParticleAmount(particles);
+      //update values for chart
+      if (
+        infectedChartLabels[infectedChartLabels.length - 1] !=
+          currentInfectedAmount ||
+        suspectibleChartLabels[suspectibleChartLabels.length - 1] !=
+          currentSuspectibleAmount
+      ) {
+        infectedChartLabels.push(currentInfectedAmount);
+        suspectibleChartLabels.push(currentSuspectibleAmount);
+        recoveredChartLabels.push(currentRecoveredAmount);
       }
+
       //check amount of suspectible, if 0 stop animation
-      if (currentSuspectibleAmount == 0) {
+      if (currentSuspectibleAmount == 0 || currentInfectedAmount == 0) {
         this.stopAnimate();
-        this.sendLabels(infectedChartLabels, suspectibleChartLabels);
+        console.log(infectedChartLabels);
+        console.log(recoveredChartLabels);
+
+        this.sendLabels(
+          infectedChartLabels,
+          suspectibleChartLabels,
+          recoveredChartLabels
+        );
       }
     }, 20);
   }

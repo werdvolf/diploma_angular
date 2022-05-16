@@ -6,31 +6,38 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root',
 })
 export class ShareService {
-  private infectedAmount = new BehaviorSubject<number | null>(10);
+  private infectedAmount = new BehaviorSubject<number>(10);
   sharedInfectedAmount = this.infectedAmount.asObservable();
 
-  private suspectibleAmount = new BehaviorSubject<number | null>(10);
+  private suspectibleAmount = new BehaviorSubject<number>(10);
   sharedSuspectibleAmount = this.suspectibleAmount.asObservable();
 
-  private suspectibleChartLabels = new BehaviorSubject<number[] | null>([]);
+  private suspectibleChartLabels = new BehaviorSubject<number[]>([]);
   sharedSuspectibleChartLabels = this.suspectibleChartLabels.asObservable();
 
-  private infectedChartLabels = new BehaviorSubject<number[] | null>([]);
+  private infectedChartLabels = new BehaviorSubject<number[]>([]);
   sharedInfectedChartLabels = this.infectedChartLabels.asObservable();
 
-  sendInfectedAmount(message: number | null) {
+  private recoveredChartLabels = new BehaviorSubject<number[]>([]);
+  sharedRecoveredChartLabels = this.recoveredChartLabels.asObservable();
+
+  sendInfectedAmount(message: number) {
     this.infectedAmount.next(message);
   }
 
-  sendSuspectibleAmount(message: number | null) {
+  sendSuspectibleAmount(message: number) {
     this.suspectibleAmount.next(message);
   }
 
-  sendInfectedChartLabels(message: number[] | null) {
+  sendInfectedChartLabels(message: number[]) {
     this.infectedChartLabels.next(message);
   }
 
-  sendSuspectibleChartLabels(message: number[] | null) {
+  sendSuspectibleChartLabels(message: number[]) {
     this.suspectibleChartLabels.next(message);
+  }
+
+  sendRecoveredChartLabels(message: number[]) {
+    this.recoveredChartLabels.next(message);
   }
 }

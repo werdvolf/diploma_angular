@@ -35,21 +35,38 @@ function updateIsInfected(a: IParticle, b: IParticle) {
   return false;
 }
 
-export function checkAndUpdate(
-  suspectible: IParticle[],
-  infected: IParticle[]
-) {
+export function getParticleAmount(array: IParticle[]) {
+  let infected: number = 0;
+  let suspectible: number = 0;
+  let recovered: number = 0;
+
+  array.forEach((el) => {
+    if (el.getStatus() == 'i') {
+      infected += 1;
+    }
+    if (el.getStatus() == 's') {
+      suspectible += 1;
+    }
+    if (el.getStatus() == 'r') {
+      recovered += 1;
+    }
+  });
+  return [infected, suspectible, recovered];
+}
+
+export function checkAndUpdate(particles: IParticle[]) {
   //loop through suspectible and infected particles
-  suspectible.forEach((s, index) => {
-    infected.forEach((i) => {
-      //if updateInfected return True,
-      //change suspectible particle status to 'i'
-      //and push it to infected array
-      if (updateIsInfected(s, i)) {
-        s.updateStatus('i');
-        s.changeColor('#FF0000');
-        infected.push(s);
-        delete suspectible[index];
+  particles.forEach((s) => {
+    particles.forEach((i) => {
+      if (i.getStatus() == 'i') {
+        //if updateInfected return True,
+        //change suspectible particle status to 'i'
+        //and push it to infected array
+        if (updateIsInfected(s, i)) {
+          s.updateStatus('i');
+          s.changeColor('#FF0000');
+          s.checkIfRecovered();
+        }
       }
     });
   });

@@ -9,8 +9,9 @@ import { ShareService } from '../share.service';
 export class PlotingComponent implements OnInit {
   data: any;
   options: any;
-  suspectible: number[] | null;
-  infected: number[] | null;
+  suspectible: number[];
+  infected: number[];
+  recovered: number[];
 
   constructor(private shareService: ShareService) {}
 
@@ -22,16 +23,19 @@ export class PlotingComponent implements OnInit {
     this.shareService.sharedSuspectibleChartLabels.subscribe(
       (message) => (this.suspectible = message)
     );
+    this.shareService.sharedRecoveredChartLabels.subscribe(
+      (message) => (this.recovered = message)
+    );
   }
   //create data for chart
-  createData(suspectible: number[] | null, infected: number[] | null) {
+  createData(suspectible: number[], infected: number[], recovered: number[]) {
     return {
       //generate labels in range 0...suspectible.length
       labels: [...Array(suspectible?.length)].map((_, i) => i),
       datasets: [
         {
           label: 'Suspectible',
-          data: this.suspectible,
+          data: suspectible,
           fill: false,
           borderColor: '#0000FF',
         },
@@ -40,6 +44,12 @@ export class PlotingComponent implements OnInit {
           data: infected,
           fill: false,
           borderColor: '#FF0000',
+        },
+        {
+          label: 'Recovered',
+          data: recovered,
+          fill: false,
+          borderColor: '#808080',
         },
       ],
     };
@@ -65,12 +75,20 @@ export class PlotingComponent implements OnInit {
 
   ngOnInit() {
     this.getLabels();
-    this.data = this.createData(this.suspectible, this.infected);
+    this.data = this.createData(
+      this.suspectible,
+      this.infected,
+      this.recovered
+    );
     this.options = this.createOptions();
   }
 
   update(event: Event) {
     this.getLabels();
-    this.data = this.createData(this.suspectible, this.infected);
+    this.data = this.createData(
+      this.suspectible,
+      this.infected,
+      this.recovered
+    );
   }
 }

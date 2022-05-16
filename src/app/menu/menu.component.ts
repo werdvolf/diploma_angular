@@ -15,11 +15,15 @@ export class MenuComponent implements OnInit {
   constructor(private shareService: ShareService) {}
 
   ngOnInit(): void {
-    this.shareService.sendInfectedAmount(this.infectedAmount);
-    this.shareService.sendSuspectibleAmount(this.suspectibleAmount);
+    if (this.infectedAmount && this.suspectibleAmount) {
+      this.shareService.sendInfectedAmount(this.infectedAmount);
+      this.shareService.sendSuspectibleAmount(this.suspectibleAmount);
+    }
   }
   onValueChange() {
-    this.shareService.sendInfectedAmount(this.infectedAmount);
-    this.shareService.sendSuspectibleAmount(this.suspectibleAmount);
+    if (this.infectedAmount && this.suspectibleAmount) {
+      this.shareService.sendInfectedAmount(this.infectedAmount);
+      this.shareService.sendSuspectibleAmount(this.suspectibleAmount);
+    }
   }
 }
