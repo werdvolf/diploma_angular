@@ -22,7 +22,7 @@ function getChance(chance: number): boolean {
 }
 
 //get distance from suspectible particle to infected
-function getDistance(a: IParticle, b: IParticle) {
+export function getDistance(a: IParticle, b: IParticle) {
   return Math.sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2);
 }
 //get distance from suspectible particle to infected
@@ -35,7 +35,7 @@ function updateIsInfected(a: IParticle, b: IParticle) {
   return false;
 }
 
-export function getParticleAmount(array: IParticle[]) {
+export function eachGroupAmount(array: IParticle[]) {
   let infected: number = 0;
   let suspectible: number = 0;
   let recovered: number = 0;
@@ -54,20 +54,32 @@ export function getParticleAmount(array: IParticle[]) {
   return [infected, suspectible, recovered];
 }
 
-export function checkAndUpdate(particles: IParticle[]) {
-  //loop through suspectible and infected particles
-  particles.forEach((s) => {
-    particles.forEach((i) => {
-      if (i.getStatus() == 'i') {
-        //if updateInfected return True,
-        //change suspectible particle status to 'i'
-        //and push it to infected array
-        if (updateIsInfected(s, i)) {
-          s.updateStatus('i');
-          s.changeColor('#FF0000');
-          s.checkIfRecovered();
-        }
-      }
-    });
-  });
+export function moveSepareta(
+  p1: IParticle,
+  p2: IParticle,
+  moveSeparate: boolean
+) {
+  if (moveSeparate) {
+    if (getDistance(p2, p1) < 20 && p1 != p2) {
+      p1.x += (p1.x - p2.x) * 0.3;
+      p1.y += (p1.y - p2.y) * 0.3;
+    }
+  }
+}
+
+export function getPerOfAmount(per: number, amount: number) {
+  return Math.round((per * amount) / 100);
+}
+
+export function checkAndUpdate(a: IParticle, b: IParticle) {
+  if (b.getStatus() == 'i') {
+    //if updateInfected return True,
+    //change suspectible particle status to 'i'
+    //and push it to infected array
+    if (updateIsInfected(a, b)) {
+      a.updateStatus('i');
+      a.changeColor('#FF0000');
+      a.checkIfRecovered();
+    }
+  }
 }

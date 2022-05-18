@@ -57,6 +57,8 @@ export class PlotingComponent implements OnInit {
 
   createOptions() {
     return {
+      responsive: false,
+      maintainAspectRatio: false,
       scales: {
         x: {
           display: false,

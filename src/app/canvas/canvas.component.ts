@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Particle, Renderer } from '../interfaces/particle';
-import { checkAndUpdate, getParticleAmount } from '../interfaces/someStaff';
+import { eachGroupAmount, getPerOfAmount } from '../interfaces/utils';
 import { ShareService } from '../share.service';
 @Component({
   selector: 'app-canvas',
@@ -12,8 +12,9 @@ export class CanvasComponent implements OnInit {
   width: number = 700;
   height: number = 700;
   suspectibleAmount: number;
-  recoveredAmount: number = 0;
   infectedAmount: number;
+  recoveredAmount: number = 0;
+  perOfSeparate: number = 80;
   intervalId: any;
   disable: boolean = false;
   //init renderer class
@@ -55,16 +56,18 @@ export class CanvasComponent implements OnInit {
     this.getParticlesAmount();
   }
 
-  createParticles(
-    numOfSuspectible: number | null,
-    numOfInfected: number | null
-  ): Particle[] {
+  createParticles(numOfSuspectible: number, numOfInfected: number): Particle[] {
     let particles: Particle[] = [];
-    if (this.ctx && numOfSuspectible && numOfInfected) {
-      for (let i = 0; i < numOfSuspectible + numOfInfected; i++) {
-        if (i < numOfInfected) particles[i] = new Particle('i');
-        else particles[i] = new Particle('s');
-      }
+    let perOfInfSeparate = getPerOfAmount(this.perOfSeparate, numOfInfected);
+    let perOfSusSeparate = getPerOfAmount(this.perOfSeparate, numOfSuspectible);
+    for (let i = 0; i < numOfSuspectible; i++) {
+      if (perOfSusSeparate < i) particles[i] = new Particle('s', true);
+      else particles[i] = new Particle('s', false);
+    }
+    for (let i = numOfSuspectible; i < numOfInfected + numOfSuspectible; i++) {
+      if (perOfInfSeparate < i - numOfSuspectible)
+        particles[i] = new Particle('i', true);
+      else particles[i] = new Particle('i', false);
     }
     return particles;
   }
@@ -89,13 +92,13 @@ export class CanvasComponent implements OnInit {
       this.renderer.animate(particles);
       //check if infected particles are in radius of suspectible
       //and update status if rolled chance
-      checkAndUpdate(particles);
+      // checkAndUpdate(particles);
       //calculate current amount of suspectible and infected particles
       [
         currentInfectedAmount,
         currentSuspectibleAmount,
         currentRecoveredAmount,
-      ] = getParticleAmount(particles);
+      ] = eachGroupAmount(particles);
       //update values for chart
       if (
         infectedChartLabels[infectedChartLabels.length - 1] !=
@@ -111,9 +114,6 @@ export class CanvasComponent implements OnInit {
       //check amount of suspectible, if 0 stop animation
       if (currentSuspectibleAmount == 0 || currentInfectedAmount == 0) {
         this.stopAnimate();
-        console.log(infectedChartLabels);
-        console.log(recoveredChartLabels);
-
         this.sendLabels(
           infectedChartLabels,
           suspectibleChartLabels,

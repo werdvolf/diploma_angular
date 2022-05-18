@@ -11,6 +11,10 @@ import { PlotingComponent } from './ploting/ploting.component';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatButtonModule } from '@angular/material/button';
 import { ChartModule } from 'primeng/chart';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { FormsModule } from '@angular/forms';
+import { DividerModule } from 'primeng/divider';
+import { InputSwitchModule } from 'primeng/inputswitch';
 
 @NgModule({
   declarations: [
@@ -27,6 +31,10 @@ import { ChartModule } from 'primeng/chart';
     MatGridListModule,
     MatButtonModule,
     ChartModule,
+    InputNumberModule,
+    FormsModule,
+    DividerModule,
+    InputSwitchModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

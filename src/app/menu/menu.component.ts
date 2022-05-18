@@ -9,21 +9,21 @@ import { ShareService } from '../share.service';
   styleUrls: ['./menu.component.scss'],
 })
 export class MenuComponent implements OnInit {
-  infectedAmount: number | null = 10;
-  suspectibleAmount: number | null = 10;
+  infectedAmount: number = 10;
+  suspectibleAmount: number = 10;
+  separationPercent: number = 0;
+  infectionRadius: number = 10;
+  timeToRecover: number = 10;
+  quarantine: boolean = false;
 
   constructor(private shareService: ShareService) {}
 
   ngOnInit(): void {
-    if (this.infectedAmount && this.suspectibleAmount) {
-      this.shareService.sendInfectedAmount(this.infectedAmount);
-      this.shareService.sendSuspectibleAmount(this.suspectibleAmount);
-    }
+    this.shareService.sendInfectedAmount(this.infectedAmount);
+    this.shareService.sendSuspectibleAmount(this.suspectibleAmount);
   }
   onValueChange() {
-    if (this.infectedAmount && this.suspectibleAmount) {
-      this.shareService.sendInfectedAmount(this.infectedAmount);
-      this.shareService.sendSuspectibleAmount(this.suspectibleAmount);
-    }
+    this.shareService.sendInfectedAmount(this.infectedAmount);
+    this.shareService.sendSuspectibleAmount(this.suspectibleAmount);
   }
 }

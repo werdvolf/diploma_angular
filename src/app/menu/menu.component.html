@@ -1,8 +1,43 @@
-<div class="menu">
-  <p>Suspectible amount {{suspectibleAmount}}</p>
-  <mat-slider color="primary" [min]="5" [max]="3000" step="5" [(value)]="suspectibleAmount" (change)="onValueChange()">
-  </mat-slider>
-  <p>Infected amount {{infectedAmount}}</p>
-  <mat-slider color="primary" [min]="1" [max]="100" step="1" [(value)]="infectedAmount" (change)="onValueChange()">
-  </mat-slider>
-</div>
+<mat-grid-list class="menu" cols="2" rowHeight="1:1">
+  <mat-grid-tile>
+    <div class="left">
+      <p>Suspectible amount {{suspectibleAmount}}</p>
+      <mat-slider color="primary" [min]="5" [max]="3000" step="5" [(ngModel)]="suspectibleAmount"
+        (change)="onValueChange()">
+      </mat-slider>
+      <p>Infected amount {{infectedAmount}}</p>
+      <mat-slider color="primary" [min]="1" [max]="100" step="1" [(ngModel)]="infectedAmount"
+        (change)="onValueChange()">
+      </mat-slider>
+      <h4>Quarantine</h4>
+      <p-inputSwitch [(ngModel)]="quarantine"></p-inputSwitch>
+    </div>
+  </mat-grid-tile>
+  <mat-grid-tile>
+    <div class="right">
+      <div class="field col-12 md:col-3">
+        <label for="soc-dist-buttons">Social Distance Percent</label>
+        <br>
+        <p-inputNumber [(ngModel)]="separationPercent" mode="decimal" [showButtons]="true" inputId="soc-dist-buttons"
+          [min]="0" [max]="100">
+        </p-inputNumber>
+      </div>
+      <div class="field col-12 md:col-3">
+        <label for="infection-radius-buttons">Infection Radius</label>
+        <br>
+        <p-inputNumber [(ngModel)]="infectionRadius" mode="decimal" [showButtons]="true"
+          inputId="infection-radius-buttons" [min]="0" [max]="100">
+        </p-inputNumber>
+      </div>
+      <div class="field col-12 md:col-3">
+        <label for="recover-time-buttons">Time to recover</label>
+        <br>
+        <p-inputNumber [(ngModel)]="timeToRecover" mode="decimal" [showButtons]="true" inputId="recover-time-buttons"
+          [min]="0" [max]="100">
+        </p-inputNumber>
+      </div>
+    </div>
+  </mat-grid-tile>
+
+
+</mat-grid-list>

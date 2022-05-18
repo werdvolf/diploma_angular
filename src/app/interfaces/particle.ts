@@ -1,4 +1,4 @@
-import * as someStaff from './someStaff';
+import * as utils from './utils';
 
 const width = 700;
 const height = 700;
@@ -7,15 +7,12 @@ const timeToRecover = 10000;
 export interface IParticle {
   x: number;
   y: number;
-  dx: number;
-  dy: number;
   status: string;
   particleRadius: number;
-  infectedTime: number;
   color: string;
+  moveSeparate: boolean;
   move(): void;
   updateStatus(value: string): void;
-  setSpeed(dx: number, dy: number): void;
   getStatus(): string;
   changeColor(value: string): void;
   checkIfRecovered(): void;
@@ -24,16 +21,18 @@ export interface IParticle {
 export class Particle implements IParticle {
   status: string;
   particleRadius = 5;
-  infectedTime = 0;
   color: string;
-  x = someStaff.random(this.particleRadius, width - this.particleRadius);
-  dx = someStaff.randomSpeedUp(-4, 4);
+  moveSeparate: boolean;
 
-  y = someStaff.random(this.particleRadius, height - this.particleRadius);
-  dy = someStaff.randomSpeedUp(-4, 4);
+  x = utils.random(this.particleRadius, width - this.particleRadius);
+  dx = utils.randomSpeedUp(-4, 4);
 
-  constructor(status: string) {
+  y = utils.random(this.particleRadius, height - this.particleRadius);
+  dy = utils.randomSpeedUp(-4, 4);
+
+  constructor(status: string, moveSeparate: boolean) {
     this.status = status;
+    this.moveSeparate = moveSeparate;
     if (this.status == 'i') {
       this.color = '#FF0000';
       this.checkIfRecovered();
@@ -45,16 +44,20 @@ export class Particle implements IParticle {
   }
 
   public move() {
-    if (
-      this.x + this.dx > width - this.particleRadius ||
-      this.x + this.dx < this.particleRadius
-    ) {
+    if (this.x + this.dx >= width - this.particleRadius) {
+      this.x = width - this.particleRadius;
       this.dx = -this.dx;
     }
-    if (
-      this.y + this.dy > height - this.particleRadius ||
-      this.y + this.dy < this.particleRadius
-    ) {
+    if (this.x + this.dx <= this.particleRadius) {
+      this.x = this.particleRadius;
+      this.dx = -this.dx;
+    }
+    if (this.y + this.dy >= height - this.particleRadius) {
+      this.y = height - this.particleRadius;
+      this.dy = -this.dy;
+    }
+    if (this.y + this.dy <= this.particleRadius) {
+      this.y = this.particleRadius;
       this.dy = -this.dy;
     }
     this.x += this.dx;
@@ -88,21 +91,19 @@ export class Particle implements IParticle {
 export class Renderer {
   constructor(private ctx: CanvasRenderingContext2D) {}
 
-  public animate(particles: Particle[]): void {
+  public animate(particles: IParticle[]): void {
     this.ctx.clearRect(0, 0, width, height);
-    particles.forEach((particle) => {
+    particles.forEach((p1) => {
       this.ctx.beginPath();
-      this.ctx.arc(
-        particle.x,
-        particle.y,
-        particle.particleRadius,
-        0,
-        Math.PI * 2
-      );
-      this.ctx.fillStyle = particle.color;
+      this.ctx.arc(p1.x, p1.y, p1.particleRadius, 0, Math.PI * 2);
+      this.ctx.fillStyle = p1.color;
       this.ctx.fill();
       this.ctx.closePath();
-      particle.move();
+      particles.forEach((p2) => {
+        utils.checkAndUpdate(p1, p2);
+        utils.moveSepareta(p1, p2, p1.moveSeparate);
+      });
+      p1.move();
     });
   }
 }
