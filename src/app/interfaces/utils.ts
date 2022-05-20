@@ -1,7 +1,5 @@
 import { IParticle } from './particle';
 
-//distance to infect
-const distanceToInfect: number = 5;
 //chance to infect
 const chanceToInfect: number = 0.1;
 
@@ -28,7 +26,12 @@ export function getDistance(a: IParticle, b: IParticle) {
 //get distance from suspectible particle to infected
 // if distance in range which we determined return chance
 // else return false
-function updateIsInfected(a: IParticle, b: IParticle) {
+function updateIsInfected(
+  a: IParticle,
+  b: IParticle,
+  distanceToInfect: number,
+  chanceToInfect: number
+) {
   if (getDistance(a, b) < distanceToInfect && a.getStatus() == 's') {
     return getChance(chanceToInfect);
   }
@@ -54,7 +57,7 @@ export function eachGroupAmount(array: IParticle[]) {
   return [infected, suspectible, recovered];
 }
 
-export function moveSepareta(
+export function moveSeparate(
   p1: IParticle,
   p2: IParticle,
   moveSeparate: boolean
@@ -71,12 +74,17 @@ export function getPerOfAmount(per: number, amount: number) {
   return Math.round((per * amount) / 100);
 }
 
-export function checkAndUpdate(a: IParticle, b: IParticle) {
+export function checkAndUpdate(
+  a: IParticle,
+  b: IParticle,
+  distanceToInfect: number,
+  chanceToInfect: number
+) {
   if (b.getStatus() == 'i') {
     //if updateInfected return True,
     //change suspectible particle status to 'i'
     //and push it to infected array
-    if (updateIsInfected(a, b)) {
+    if (updateIsInfected(a, b, distanceToInfect, chanceToInfect)) {
       a.updateStatus('i');
       a.changeColor('#FF0000');
       a.checkIfRecovered();

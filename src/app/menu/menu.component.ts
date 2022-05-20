@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
-
+import { IParams } from '../interfaces/interfaces';
 import { ShareService } from '../share.service';
 
 @Component({
@@ -9,21 +8,22 @@ import { ShareService } from '../share.service';
   styleUrls: ['./menu.component.scss'],
 })
 export class MenuComponent implements OnInit {
-  infectedAmount: number = 10;
-  suspectibleAmount: number = 10;
-  separationPercent: number = 0;
-  infectionRadius: number = 10;
-  timeToRecover: number = 10;
-  quarantine: boolean = false;
+  params: IParams = {
+    infectedAmount: 10,
+    suspectibleAmount: 10,
+    separationPercent: 10,
+    infectionRadius: 10,
+    timeToRecover: 10,
+    chanceToInfect: 0.1,
+    // quarantine: false,
+  };
 
   constructor(private shareService: ShareService) {}
 
   ngOnInit(): void {
-    this.shareService.sendInfectedAmount(this.infectedAmount);
-    this.shareService.sendSuspectibleAmount(this.suspectibleAmount);
+    this.shareService.sendParams(this.params);
   }
   onValueChange() {
-    this.shareService.sendInfectedAmount(this.infectedAmount);
-    this.shareService.sendSuspectibleAmount(this.suspectibleAmount);
+    this.shareService.sendParams(this.params);
   }
 }

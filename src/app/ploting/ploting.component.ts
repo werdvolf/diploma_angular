@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ILabels } from '../interfaces/interfaces';
 import { ShareService } from '../share.service';
 
 @Component({
@@ -9,22 +10,14 @@ import { ShareService } from '../share.service';
 export class PlotingComponent implements OnInit {
   data: any;
   options: any;
-  suspectible: number[];
-  infected: number[];
-  recovered: number[];
+  labels: ILabels;
 
   constructor(private shareService: ShareService) {}
 
   //get labels from share service
   getLabels() {
-    this.shareService.sharedInfectedChartLabels.subscribe(
-      (message) => (this.infected = message)
-    );
-    this.shareService.sharedSuspectibleChartLabels.subscribe(
-      (message) => (this.suspectible = message)
-    );
-    this.shareService.sharedRecoveredChartLabels.subscribe(
-      (message) => (this.recovered = message)
+    this.shareService.sharedLabels.subscribe(
+      (message) => (this.labels = message)
     );
   }
   //create data for chart
@@ -78,9 +71,9 @@ export class PlotingComponent implements OnInit {
   ngOnInit() {
     this.getLabels();
     this.data = this.createData(
-      this.suspectible,
-      this.infected,
-      this.recovered
+      this.labels.suspectibleLabels,
+      this.labels.infectedLabels,
+      this.labels.recoveredLabels
     );
     this.options = this.createOptions();
   }
@@ -88,9 +81,9 @@ export class PlotingComponent implements OnInit {
   update(event: Event) {
     this.getLabels();
     this.data = this.createData(
-      this.suspectible,
-      this.infected,
-      this.recovered
+      this.labels.suspectibleLabels,
+      this.labels.infectedLabels,
+      this.labels.recoveredLabels
     );
   }
 }

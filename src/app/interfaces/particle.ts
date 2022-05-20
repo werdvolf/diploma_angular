@@ -2,7 +2,6 @@ import * as utils from './utils';
 
 const width = 700;
 const height = 700;
-const timeToRecover = 10000;
 
 export interface IParticle {
   x: number;
@@ -11,6 +10,9 @@ export interface IParticle {
   particleRadius: number;
   color: string;
   moveSeparate: boolean;
+  distanceToInfect: number;
+  timeToRecover: number;
+  chanceToInfect: number;
   move(): void;
   updateStatus(value: string): void;
   getStatus(): string;
@@ -23,6 +25,9 @@ export class Particle implements IParticle {
   particleRadius = 5;
   color: string;
   moveSeparate: boolean;
+  distanceToInfect: number;
+  timeToRecover: number;
+  chanceToInfect: number;
 
   x = utils.random(this.particleRadius, width - this.particleRadius);
   dx = utils.randomSpeedUp(-4, 4);
@@ -30,7 +35,16 @@ export class Particle implements IParticle {
   y = utils.random(this.particleRadius, height - this.particleRadius);
   dy = utils.randomSpeedUp(-4, 4);
 
-  constructor(status: string, moveSeparate: boolean) {
+  constructor(
+    status: string,
+    moveSeparate: boolean,
+    distanceToInfect: number,
+    timeToRecover: number,
+    chanceToInfect: number
+  ) {
+    this.chanceToInfect = chanceToInfect;
+    this.timeToRecover = timeToRecover * 1000;
+    this.distanceToInfect = distanceToInfect;
     this.status = status;
     this.moveSeparate = moveSeparate;
     if (this.status == 'i') {
@@ -84,7 +98,7 @@ export class Particle implements IParticle {
     setTimeout(() => {
       this.updateStatus('r');
       this.changeColor('#808080');
-    }, timeToRecover);
+    }, this.timeToRecover);
   }
 }
 
@@ -100,8 +114,8 @@ export class Renderer {
       this.ctx.fill();
       this.ctx.closePath();
       particles.forEach((p2) => {
-        utils.checkAndUpdate(p1, p2);
-        utils.moveSepareta(p1, p2, p1.moveSeparate);
+        utils.checkAndUpdate(p1, p2, p1.distanceToInfect, p1.chanceToInfect);
+        utils.moveSeparate(p1, p2, p1.moveSeparate);
       });
       p1.move();
     });

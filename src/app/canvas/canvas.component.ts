@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { ILabels, IParams } from '../interfaces/interfaces';
 import { Particle, Renderer } from '../interfaces/particle';
 import { eachGroupAmount, getPerOfAmount } from '../interfaces/utils';
 import { ShareService } from '../share.service';
@@ -11,14 +12,19 @@ export class CanvasComponent implements OnInit {
   //canvas width and heigth
   width: number = 700;
   height: number = 700;
-  suspectibleAmount: number;
-  infectedAmount: number;
-  recoveredAmount: number = 0;
-  perOfSeparate: number = 80;
   intervalId: any;
   disable: boolean = false;
   //init renderer class
   renderer: Renderer;
+  params: IParams = {
+    infectedAmount: 10,
+    suspectibleAmount: 10,
+    separationPercent: 0,
+    infectionRadius: 10,
+    timeToRecover: 10,
+    chanceToInfect: 0.1,
+    // quarantine: false,
+  };
 
   constructor(private shareService: ShareService) {}
 
@@ -28,23 +34,14 @@ export class CanvasComponent implements OnInit {
   private ctx: CanvasRenderingContext2D | null;
 
   //send labels to share service
-  sendLabels(
-    infectedChartLabels: number[],
-    suspectibleChartLabels: number[],
-    recoveredChartLabels: number[]
-  ) {
-    this.shareService.sendInfectedChartLabels(infectedChartLabels);
-    this.shareService.sendSuspectibleChartLabels(suspectibleChartLabels);
-    this.shareService.sendRecoveredChartLabels(recoveredChartLabels);
+  sendLabels(labels: ILabels) {
+    this.shareService.sendLabels(labels);
   }
 
   //get particles amount from share service
   getParticlesAmount() {
-    this.shareService.sharedInfectedAmount.subscribe((message) => {
-      this.infectedAmount = message;
-    });
-    this.shareService.sharedSuspectibleAmount.subscribe(
-      (message) => (this.suspectibleAmount = message)
+    this.shareService.sharedParams.subscribe(
+      (message) => (this.params = message)
     );
   }
 
@@ -58,36 +55,72 @@ export class CanvasComponent implements OnInit {
 
   createParticles(numOfSuspectible: number, numOfInfected: number): Particle[] {
     let particles: Particle[] = [];
-    let perOfInfSeparate = getPerOfAmount(this.perOfSeparate, numOfInfected);
-    let perOfSusSeparate = getPerOfAmount(this.perOfSeparate, numOfSuspectible);
+    let perOfInfSeparate = getPerOfAmount(
+      this.params.separationPercent,
+      numOfInfected
+    );
+    let perOfSusSeparate = getPerOfAmount(
+      this.params.separationPercent,
+      numOfSuspectible
+    );
     for (let i = 0; i < numOfSuspectible; i++) {
-      if (perOfSusSeparate < i) particles[i] = new Particle('s', true);
-      else particles[i] = new Particle('s', false);
+      if (perOfSusSeparate < i)
+        particles[i] = new Particle(
+          's',
+          false,
+          this.params.infectionRadius,
+          this.params.timeToRecover,
+          this.params.chanceToInfect
+        );
+      else
+        particles[i] = new Particle(
+          's',
+          true,
+          this.params.infectionRadius,
+          this.params.timeToRecover,
+          this.params.chanceToInfect
+        );
     }
     for (let i = numOfSuspectible; i < numOfInfected + numOfSuspectible; i++) {
       if (perOfInfSeparate < i - numOfSuspectible)
-        particles[i] = new Particle('i', true);
-      else particles[i] = new Particle('i', false);
+        particles[i] = new Particle(
+          'i',
+          false,
+          this.params.infectionRadius,
+          this.params.timeToRecover,
+          this.params.chanceToInfect
+        );
+      else
+        particles[i] = new Particle(
+          'i',
+          true,
+          this.params.infectionRadius,
+          this.params.timeToRecover,
+          this.params.chanceToInfect
+        );
     }
     return particles;
   }
 
   startAnimate(): void {
+    let lebels: ILabels = {
+      suspectibleLabels: [],
+      infectedLabels: [],
+      recoveredLabels: [],
+    };
     this.disable = true;
     let currentSuspectibleAmount: number,
       currentInfectedAmount: number,
       currentRecoveredAmount: number;
-    let infectedChartLabels: number[] = [this.infectedAmount],
-      suspectibleChartLabels: number[] = [this.suspectibleAmount],
-      recoveredChartLabels: number[] = [this.recoveredAmount];
     //crete particles
     let particles = this.createParticles(
-      this.suspectibleAmount,
-      this.infectedAmount
+      this.params.suspectibleAmount,
+      this.params.infectedAmount
     );
     //create array for chart
 
     this.intervalId = setInterval(() => {
+      let seconds = 0;
       //render particles
       this.renderer.animate(particles);
       //check if infected particles are in radius of suspectible
@@ -100,26 +133,17 @@ export class CanvasComponent implements OnInit {
         currentRecoveredAmount,
       ] = eachGroupAmount(particles);
       //update values for chart
-      if (
-        infectedChartLabels[infectedChartLabels.length - 1] !=
-          currentInfectedAmount ||
-        suspectibleChartLabels[suspectibleChartLabels.length - 1] !=
-          currentSuspectibleAmount
-      ) {
-        infectedChartLabels.push(currentInfectedAmount);
-        suspectibleChartLabels.push(currentSuspectibleAmount);
-        recoveredChartLabels.push(currentRecoveredAmount);
+      if (seconds == 0 || seconds % 1000 == 0) {
+        lebels.infectedLabels.push(currentInfectedAmount);
+        lebels.suspectibleLabels.push(currentSuspectibleAmount);
+        lebels.recoveredLabels.push(currentRecoveredAmount);
       }
-
       //check amount of suspectible, if 0 stop animation
       if (currentSuspectibleAmount == 0 || currentInfectedAmount == 0) {
         this.stopAnimate();
-        this.sendLabels(
-          infectedChartLabels,
-          suspectibleChartLabels,
-          recoveredChartLabels
-        );
+        this.sendLabels(lebels);
       }
+      seconds += 20;
     }, 20);
   }
 

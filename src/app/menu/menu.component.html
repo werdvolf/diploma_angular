@@ -1,16 +1,16 @@
 <mat-grid-list class="menu" cols="2" rowHeight="1:1">
   <mat-grid-tile>
     <div class="left">
-      <p>Suspectible amount {{suspectibleAmount}}</p>
-      <mat-slider color="primary" [min]="5" [max]="3000" step="5" [(ngModel)]="suspectibleAmount"
+      <p>Suspectible amount {{params.suspectibleAmount}}</p>
+      <mat-slider color="primary" [min]="5" [max]="3000" step="5" [(ngModel)]="params.suspectibleAmount"
         (change)="onValueChange()">
       </mat-slider>
-      <p>Infected amount {{infectedAmount}}</p>
-      <mat-slider color="primary" [min]="1" [max]="100" step="1" [(ngModel)]="infectedAmount"
+      <p>Infected amount {{params.infectedAmount}}</p>
+      <mat-slider color="primary" [min]="1" [max]="100" step="1" [(ngModel)]="params.infectedAmount"
         (change)="onValueChange()">
       </mat-slider>
-      <h4>Quarantine</h4>
-      <p-inputSwitch [(ngModel)]="quarantine"></p-inputSwitch>
+      <!-- <h4>Quarantine</h4>
+      <p-inputSwitch [(ngModel)]="params.quarantine"></p-inputSwitch> -->
     </div>
   </mat-grid-tile>
   <mat-grid-tile>
@@ -18,22 +18,29 @@
       <div class="field col-12 md:col-3">
         <label for="soc-dist-buttons">Social Distance Percent</label>
         <br>
-        <p-inputNumber [(ngModel)]="separationPercent" mode="decimal" [showButtons]="true" inputId="soc-dist-buttons"
-          [min]="0" [max]="100">
+        <p-inputNumber [(ngModel)]="params.separationPercent" mode="decimal" [showButtons]="true"
+          inputId="soc-dist-buttons" [min]="0" [max]="100">
         </p-inputNumber>
       </div>
       <div class="field col-12 md:col-3">
         <label for="infection-radius-buttons">Infection Radius</label>
         <br>
-        <p-inputNumber [(ngModel)]="infectionRadius" mode="decimal" [showButtons]="true"
+        <p-inputNumber [(ngModel)]="params.infectionRadius" mode="decimal" [showButtons]="true"
           inputId="infection-radius-buttons" [min]="0" [max]="100">
         </p-inputNumber>
       </div>
       <div class="field col-12 md:col-3">
         <label for="recover-time-buttons">Time to recover</label>
         <br>
-        <p-inputNumber [(ngModel)]="timeToRecover" mode="decimal" [showButtons]="true" inputId="recover-time-buttons"
-          [min]="0" [max]="100">
+        <p-inputNumber [(ngModel)]="params.timeToRecover" mode="decimal" [showButtons]="true"
+          inputId="recover-time-buttons" [min]="0" [max]="100">
+        </p-inputNumber>
+      </div>
+      <div class="field col-12 md:col-3">
+        <label for="infection-chance-buttons">Chance To Infect</label>
+        <br>
+        <p-inputNumber [(ngModel)]="params.chanceToInfect" mode="decimal" [showButtons]="true" [step]="0.1"
+          inputId="infection-chance-buttons" [min]="0" [max]="1">
         </p-inputNumber>
       </div>
     </div>

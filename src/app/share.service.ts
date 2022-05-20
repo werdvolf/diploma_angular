@@ -1,43 +1,36 @@
 import { Injectable } from '@angular/core';
-
+import { IParams, ILabels } from './interfaces/interfaces';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ShareService {
-  private infectedAmount = new BehaviorSubject<number>(10);
-  sharedInfectedAmount = this.infectedAmount.asObservable();
+  defaultParams: IParams = {
+    infectedAmount: 10,
+    suspectibleAmount: 10,
+    separationPercent: 10,
+    infectionRadius: 10,
+    timeToRecover: 10,
+    chanceToInfect: 0.1,
+    // quarantine: false,
+  };
 
-  private suspectibleAmount = new BehaviorSubject<number>(10);
-  sharedSuspectibleAmount = this.suspectibleAmount.asObservable();
+  defaulLabels: ILabels = {
+    infectedLabels: [],
+    suspectibleLabels: [],
+    recoveredLabels: [],
+  };
 
-  private suspectibleChartLabels = new BehaviorSubject<number[]>([]);
-  sharedSuspectibleChartLabels = this.suspectibleChartLabels.asObservable();
-
-  private infectedChartLabels = new BehaviorSubject<number[]>([]);
-  sharedInfectedChartLabels = this.infectedChartLabels.asObservable();
-
-  private recoveredChartLabels = new BehaviorSubject<number[]>([]);
-  sharedRecoveredChartLabels = this.recoveredChartLabels.asObservable();
-
-  sendInfectedAmount(message: number) {
-    this.infectedAmount.next(message);
+  private params = new BehaviorSubject<IParams>(this.defaultParams);
+  sharedParams = this.params.asObservable();
+  sendParams(message: IParams) {
+    this.params.next(message);
   }
 
-  sendSuspectibleAmount(message: number) {
-    this.suspectibleAmount.next(message);
-  }
-
-  sendInfectedChartLabels(message: number[]) {
-    this.infectedChartLabels.next(message);
-  }
-
-  sendSuspectibleChartLabels(message: number[]) {
-    this.suspectibleChartLabels.next(message);
-  }
-
-  sendRecoveredChartLabels(message: number[]) {
-    this.recoveredChartLabels.next(message);
+  private labels = new BehaviorSubject<ILabels>(this.defaulLabels);
+  sharedLabels = this.labels.asObservable();
+  sendLabels(message: ILabels) {
+    this.labels.next(message);
   }
 }
