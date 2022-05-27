@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { ILabels, IParams } from '../interfaces/interfaces';
-import { Particle, Renderer } from '../interfaces/particle';
-import { eachGroupAmount, getPerOfAmount } from '../interfaces/utils';
+import { Person, Renderer } from '../interfaces/person';
+import { eachGroupAmount, updateAllParams } from '../interfaces/utils';
 import { ShareService } from '../share.service';
 @Component({
   selector: 'app-canvas',
@@ -14,16 +14,16 @@ export class CanvasComponent implements OnInit {
   height: number = 700;
   intervalId: any;
   disable: boolean = false;
-  //init renderer class
   renderer: Renderer;
   params: IParams = {
-    infectedAmount: 10,
-    suspectibleAmount: 10,
+    infectiousAmount: 10,
+    susceptibleAmount: 10,
     separationPercent: 0,
     infectionRadius: 10,
     timeToRecover: 10,
     chanceToInfect: 0.1,
-    // quarantine: false,
+    quarantinePercent: 0,
+    vaccinePercent: 0,
   };
 
   constructor(private shareService: ShareService) {}
@@ -53,93 +53,76 @@ export class CanvasComponent implements OnInit {
     this.getParticlesAmount();
   }
 
-  createParticles(numOfSuspectible: number, numOfInfected: number): Particle[] {
-    let particles: Particle[] = [];
-    let perOfInfSeparate = getPerOfAmount(
-      this.params.separationPercent,
-      numOfInfected
-    );
-    let perOfSusSeparate = getPerOfAmount(
-      this.params.separationPercent,
-      numOfSuspectible
-    );
-    for (let i = 0; i < numOfSuspectible; i++) {
-      if (perOfSusSeparate < i)
-        particles[i] = new Particle(
+  createParticles(numOfSusceptible: number, numOfInfectious: number): Person[] {
+    let persons: Person[] = [];
+    for (let i = 0; i < numOfSusceptible + numOfInfectious; i++) {
+      if (i < numOfSusceptible) {
+        persons[i] = new Person(
           's',
-          false,
           this.params.infectionRadius,
           this.params.timeToRecover,
           this.params.chanceToInfect
         );
-      else
-        particles[i] = new Particle(
-          's',
-          true,
-          this.params.infectionRadius,
-          this.params.timeToRecover,
-          this.params.chanceToInfect
-        );
-    }
-    for (let i = numOfSuspectible; i < numOfInfected + numOfSuspectible; i++) {
-      if (perOfInfSeparate < i - numOfSuspectible)
-        particles[i] = new Particle(
+      } else {
+        persons[i] = new Person(
           'i',
-          false,
           this.params.infectionRadius,
           this.params.timeToRecover,
           this.params.chanceToInfect
         );
-      else
-        particles[i] = new Particle(
-          'i',
-          true,
-          this.params.infectionRadius,
-          this.params.timeToRecover,
-          this.params.chanceToInfect
-        );
+      }
     }
-    return particles;
+    return persons;
   }
 
   startAnimate(): void {
+    //disable button
+    this.disable = true;
+    // init labels for chart
     let lebels: ILabels = {
-      suspectibleLabels: [],
-      infectedLabels: [],
+      susceptibleLabels: [],
+      infectiousLabels: [],
       recoveredLabels: [],
     };
-    this.disable = true;
+    // init current amount persons in each group
     let currentSuspectibleAmount: number,
       currentInfectedAmount: number,
       currentRecoveredAmount: number;
-    //crete particles
-    let particles = this.createParticles(
-      this.params.suspectibleAmount,
-      this.params.infectedAmount
+    //crete group of persons
+    let persons = this.createParticles(
+      this.params.susceptibleAmount,
+      this.params.infectiousAmount
     );
-    //create array for chart
+    updateAllParams(
+      this.params.vaccinePercent,
+      this.params.quarantinePercent,
+      this.params.separationPercent,
+      persons
+    );
+    // count seconds
+    let seconds = 0;
 
     this.intervalId = setInterval(() => {
-      let seconds = 0;
-      //render particles
-      this.renderer.animate(particles);
-      //check if infected particles are in radius of suspectible
-      //and update status if rolled chance
-      // checkAndUpdate(particles);
-      //calculate current amount of suspectible and infected particles
+      //render persons
+      this.renderer.animate(persons);
+      //calculate current amount of susceptible and infected persons
       [
         currentInfectedAmount,
         currentSuspectibleAmount,
         currentRecoveredAmount,
-      ] = eachGroupAmount(particles);
+      ] = eachGroupAmount(persons);
       //update values for chart
-      if (seconds == 0 || seconds % 1000 == 0) {
-        lebels.infectedLabels.push(currentInfectedAmount);
-        lebels.suspectibleLabels.push(currentSuspectibleAmount);
+      if (seconds == 0 || seconds % 240 == 0) {
+        lebels.infectiousLabels.push(currentInfectedAmount);
+        lebels.susceptibleLabels.push(currentSuspectibleAmount);
         lebels.recoveredLabels.push(currentRecoveredAmount);
       }
-      //check amount of suspectible, if 0 stop animation
-      if (currentSuspectibleAmount == 0 || currentInfectedAmount == 0) {
+      //check amount of susceptible, if 0 stop animation
+      if (
+        currentSuspectibleAmount == 0 ||
+        currentInfectedAmount == 0 ||
+        currentRecoveredAmount == persons.length
+      ) {
         this.stopAnimate();
         this.sendLabels(lebels);
       }

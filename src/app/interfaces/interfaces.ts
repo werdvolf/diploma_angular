@@ -1,15 +1,16 @@
 export interface IParams {
-  infectedAmount: number;
-  suspectibleAmount: number;
-  separationPercent: number;
+  infectiousAmount: number;
+  susceptibleAmount: number;
   infectionRadius: number;
   timeToRecover: number;
   chanceToInfect: number;
-  // quarantine: boolean;
+  separationPercent: number;
+  quarantinePercent: number;
+  vaccinePercent: number;
 }
 
 export interface ILabels {
-  infectedLabels: number[];
-  suspectibleLabels: number[];
+  infectiousLabels: number[];
+  susceptibleLabels: number[];
   recoveredLabels: number[];
 }

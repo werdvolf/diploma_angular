@@ -8,21 +8,30 @@ import { ShareService } from '../share.service';
   styleUrls: ['./menu.component.scss'],
 })
 export class MenuComponent implements OnInit {
+  quarantine: boolean = false;
+  vaccine: boolean = false;
   params: IParams = {
-    infectedAmount: 10,
-    suspectibleAmount: 10,
-    separationPercent: 10,
+    infectiousAmount: 10,
+    susceptibleAmount: 10,
+    separationPercent: 0,
     infectionRadius: 10,
     timeToRecover: 10,
     chanceToInfect: 0.1,
-    // quarantine: false,
+    quarantinePercent: 0,
+    vaccinePercent: 0,
   };
 
   constructor(private shareService: ShareService) {}
 
+  onCheckboxChange() {
+    if (this.quarantine == false) this.params.quarantinePercent = 0;
+    if (this.vaccine == false) this.params.vaccinePercent = 0;
+  }
+
   ngOnInit(): void {
     this.shareService.sendParams(this.params);
   }
+
   onValueChange() {
     this.shareService.sendParams(this.params);
   }

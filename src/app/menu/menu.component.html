@@ -1,16 +1,30 @@
-<mat-grid-list class="menu" cols="2" rowHeight="1:1">
+<mat-grid-list class="menu" cols="2">
   <mat-grid-tile>
     <div class="left">
-      <p>Suspectible amount {{params.suspectibleAmount}}</p>
-      <mat-slider color="primary" [min]="5" [max]="3000" step="5" [(ngModel)]="params.suspectibleAmount"
+      <p>Suspectible amount {{params.susceptibleAmount}}</p>
+      <mat-slider color="primary" [min]="5" [max]="250" step="5" [(ngModel)]="params.susceptibleAmount"
         (change)="onValueChange()">
       </mat-slider>
-      <p>Infected amount {{params.infectedAmount}}</p>
-      <mat-slider color="primary" [min]="1" [max]="100" step="1" [(ngModel)]="params.infectedAmount"
+      <p>Infected amount {{params.infectiousAmount}}</p>
+      <mat-slider color="primary" [min]="1" [max]="50" step="1" [(ngModel)]="params.infectiousAmount"
         (change)="onValueChange()">
       </mat-slider>
-      <!-- <h4>Quarantine</h4>
-      <p-inputSwitch [(ngModel)]="params.quarantine"></p-inputSwitch> -->
+      <h4>Quarantine</h4>
+      <p-inputSwitch [(ngModel)]="quarantine" (onChange)="onCheckboxChange()"></p-inputSwitch>
+      <br>
+      <label for="soc-dist-buttons">Quarantine Percent</label>
+      <br>
+      <p-inputNumber [(ngModel)]="params.quarantinePercent" [disabled]="!quarantine" mode="decimal" [showButtons]="true"
+        inputId="soc-dist-buttons" [min]="0" [max]="100">
+      </p-inputNumber>
+      <h4>Vaccine</h4>
+      <p-inputSwitch [(ngModel)]="vaccine" (onChange)="onCheckboxChange()"></p-inputSwitch>
+      <br>
+      <label for=" soc-dist-buttons">Vaccine Percent</label>
+      <br>
+      <p-inputNumber [(ngModel)]="params.vaccinePercent" [disabled]="!vaccine" mode="decimal" [showButtons]="true"
+        inputId="soc-dist-buttons" [min]="0" [max]="100">
+      </p-inputNumber>
     </div>
   </mat-grid-tile>
   <mat-grid-tile>
@@ -45,6 +59,4 @@
       </div>
     </div>
   </mat-grid-tile>
-
-
 </mat-grid-list>

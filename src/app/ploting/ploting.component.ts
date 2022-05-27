@@ -71,8 +71,8 @@ export class PlotingComponent implements OnInit {
   ngOnInit() {
     this.getLabels();
     this.data = this.createData(
-      this.labels.suspectibleLabels,
-      this.labels.infectedLabels,
+      this.labels.susceptibleLabels,
+      this.labels.infectiousLabels,
       this.labels.recoveredLabels
     );
     this.options = this.createOptions();
@@ -81,8 +81,8 @@ export class PlotingComponent implements OnInit {
   update(event: Event) {
     this.getLabels();
     this.data = this.createData(
-      this.labels.suspectibleLabels,
-      this.labels.infectedLabels,
+      this.labels.susceptibleLabels,
+      this.labels.infectiousLabels,
       this.labels.recoveredLabels
     );
   }

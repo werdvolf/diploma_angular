@@ -7,18 +7,19 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class ShareService {
   defaultParams: IParams = {
-    infectedAmount: 10,
-    suspectibleAmount: 10,
+    infectiousAmount: 10,
+    susceptibleAmount: 10,
     separationPercent: 10,
     infectionRadius: 10,
     timeToRecover: 10,
     chanceToInfect: 0.1,
-    // quarantine: false,
+    quarantinePercent: 0,
+    vaccinePercent: 0,
   };
 
   defaulLabels: ILabels = {
-    infectedLabels: [],
-    suspectibleLabels: [],
+    infectiousLabels: [],
+    susceptibleLabels: [],
     recoveredLabels: [],
   };
 
